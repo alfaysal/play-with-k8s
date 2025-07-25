@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-cluster-svc
+spec:
+  selector:
+    app: nginx-label
+  type: ClusterIP
+  ports:
+    - port: 8082
+      targetPort: 80
