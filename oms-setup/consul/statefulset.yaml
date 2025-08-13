@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: consul
+  namespace: consul
+spec:
+  serviceName: "consul"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      labels:
+        app: consul
+    spec:
+      containers:
+        - name: consul
+          image: hashicorp/consul:1.19
+          args:
+            - "agent"
+            - "-server"
+            - "-bootstrap-expect=1"
+            - "-ui"
+            - "-client=0.0.0.0"
+            - "-data-dir=/consul/data"
+          ports:
+            - name: http
+              containerPort: 8500
+            - name: serf
+              containerPort: 8301
+            - name: serf-wan
+              containerPort: 8302
+            - name: server
+              containerPort: 8300
+          volumeMounts:
+            - name: consul-data
+              mountPath: /consul/data
+  volumeClaimTemplates:
+  - metadata:
+      name: consul-data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: consul-storage
+      resources:
+        requests:
+          storage: 1Gi
